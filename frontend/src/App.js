@@ -9,7 +9,8 @@ function App() {
   		<Header/>
     	<Routes/>
     </BrowserRouter>
-  );
+		
+  ); 
 }
 
 export default App;

@@ -47,6 +47,11 @@ section#post-list article footer .actions{
 	justify-content: space-around;
 }
 
+section#post-list article footer .actions button{
+	background: none;
+	border: none;
+}
+
 section#post-list article footer .actions img{
 	height: 20px;
 	margin-right: 10px;
@@ -59,6 +64,6 @@ section#post-list article footer p{
 }
 
 section#post-list article footer p span{
-	color: #AE381FFF;
+	color: #7159c1;
 	display: block;
 }
