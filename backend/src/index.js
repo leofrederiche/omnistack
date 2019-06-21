@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
-
+const bodyParser = require('body-parser');
 const app = express();
 
 const server = require('http').Server(app);
@@ -18,6 +18,7 @@ app.use(function(req, res, next){
 });
 
 app.use(cors());
+app.use(bodyParser.json());
 app.use('/files', express.static(path.resolve(__dirname, '..', 'uploads', 'resized')));
 
 app.use(require('./routes'));
