@@ -14,17 +14,50 @@ class Feed extends Component {
 		feed : []
 	};
 
+	new_comment = {  
+		id: '',
+		user: '',
+		comment: ''
+	};
+
 	async componentDidMount()	{
 		this.registerToSocket();
 
 		const response = await api.get('posts');
 
 		this.setState({ feed: response.data });
-	};
+	}
 	
 	handleLike = (id) => {
 		api.post(`/posts/${id}/like`);
-	};
+	}
+
+	handleNewComment = (id) => {
+		if (document.getElementById(id).style.display == 'block'){
+			document.getElementById(id).style.display = 'none';
+		}
+		else{
+			document.getElementById(id).style.display = 'block';
+			this.new_comment.id = id;
+		}
+	}
+
+	handleChangeComment = (e) => {
+		if (e.target.name == 'user'){
+			this.new_comment.user = e.target.value
+		}
+		else{
+			this.new_comment.comment = e.target.value	
+		}	
+	}
+
+	handleSendComment = async (e) => {
+		e.preventDefault();
+
+		api.post(`/posts/${this.new_comment.id}/comment`, this.new_comment);
+		
+		document.getElementById(this.new_comment.id).style.display = 'none';
+	}
 
 	registerToSocket = () => {
 		const socket = io('http://localhost:3333');
@@ -44,12 +77,27 @@ class Feed extends Component {
 				})
 			})
 		});
+
+		socket.on('comment', (newComment) => {
+			this.setState({
+				feed : this.state.feed.map(post => {
+					if (post._id == newComment._id){
+						post.comments = newComment.comments;
+					};
+
+					return post;
+				})
+			})
+		})
+		
 	};
 
 	render(){
 		return(
 			<section id="post-list">	
 				{ this.state.feed.map(post => (
+
+
 					<article>
 						<header>
 							<div class="user-info">
@@ -67,7 +115,7 @@ class Feed extends Component {
 								<button type="button" onClick={() => this.handleLike(post._id)}>
 									<img src={like} alt="Curtir"/>
 								</button>
-								<img src={comment} alt="Comentar"/>
+								<img src={comment} alt="Comentar" onClick={() => this.handleNewComment(post._id)} />
 								<img src={send} alt="Enviar Mensagem"/>
 							</div>
 
@@ -77,6 +125,37 @@ class Feed extends Component {
 								{post.description}
 								<span>{post.hashtags}</span>
 							</p>
+
+							<div class="comments">
+								{ post.comments.map(comment => (
+									<p>
+										<b>{comment.user}</b> {comment.comment}
+									</p>
+								)) }
+							</div>
+
+							<div class="new-comment" id={post._id} >
+								<form class="form-comment">
+									<input 
+										type="text"
+										name="user"
+										placeholder="Usuário"
+										onChange={this.handleChangeComment}
+									/>
+
+									<input 
+										type="text"
+										name="comment"
+										placeholder="Comentário"
+										onChange={this.handleChangeComment}
+									/>
+
+									<button type="submit" onClick={this.handleSendComment}>
+										Comentar
+									</button>
+								</form>
+							</div>
+
 						</footer>
 					</article>
 				)) }

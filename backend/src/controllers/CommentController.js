@@ -1,7 +1,7 @@
 const Post = require('../models/Post');
 
 module.exports = {
-    async store(req, res, data){
+    async store(req, res){
         const comment = req.body;
         const post = await Post.findById(req.params.id);
 
@@ -9,6 +9,7 @@ module.exports = {
 
         await post.save();
         
+        req.io.emit('comment', post)
         return res.json(post);
     }
 }
