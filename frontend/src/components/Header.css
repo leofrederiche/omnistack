@@ -5,11 +5,11 @@ header#main-header{
 }
 
 header#main-header .header-content{
+	width: 80%;
 	max-width: 980px;
-	width: 100%;
 	margin: 0 auto;
 	height: 72px;
-	padding: 0 30px;
+	padding: 0 30px; 
 
 	display: flex;
 	align-items: center;

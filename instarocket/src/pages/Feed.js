@@ -22,7 +22,6 @@ export default class Feed extends Component{
 		api.post(`/posts/${id}/like`);
 	};
 
-
     state = {
 		feed : []
 	};
@@ -54,8 +53,20 @@ export default class Feed extends Component{
 					return post;
 				})
 			})
+        });
+        
+        socket.on('comment', (newComment) => {
+			this.setState({
+				feed : this.state.feed.map(post => {
+					if (post._id == newComment._id){
+						post.comments = newComment.comments;
+					};
+
+					return post;
+				})
+			})
 		});
-	};
+    };
 
     render(){
         return( 
@@ -94,18 +105,29 @@ export default class Feed extends Component{
                                 <Text style={styles.likes}>{ item.likes } curtidas</Text>
                                 <Text style={styles.description}>{ item.description }</Text>
                                 <Text style={styles.hashtags}>{ item.hashtags }</Text>
+
+                                { 
+                                  item.comments.map((cmt) => {
+                                    return (
+                                      <View style={ styles.comments }>
+                                        <Text style={ styles.commentUser }>{ cmt.user }</Text>
+                                        <Text> { cmt.comment }</Text>
+                                      </View>
+                                    )
+                                  })                                    
+                                }
                             </View>
                         </View>
                     )}
                 />
             </View>
         );
-    }
+    };
 }
 
 const styles = StyleSheet.create({
     container:{
-        flex: 1
+        flex: 1,
     },
 
     feedItem:{
@@ -117,48 +139,57 @@ const styles = StyleSheet.create({
 
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center' // Alinhamento Vertical
+        alignItems: 'center', // Alinhamento Vertical
     },
 
     name:{
         fontSize: 14,
-        color: '#111'
+        color: '#111',
     },
 
     place:{
         fontSize: 10,
-        color: '#555'
+        color: '#555',
     },
 
     feedImage:{
         width: '100%',
         height: 400,
-        marginTop: 15
+        marginTop: 15,
     },
 
     feedItemFooter:{
-        paddingHorizontal: 15
+        paddingHorizontal: 15,
     },
 
     actions:{
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: 15
+        marginVertical: 15,
     },
 
     likes:{
         color: '#111',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
 
     description:{
         color: '#111',
-        lineHeight: 18
+        lineHeight: 18,
     },
 
     hashtags:{
-        color: '#7159c1'
+        color: '#7159c1',
+    },
+
+    comments:{
+      flexDirection: 'row',
+    },
+
+    commentUser: {
+      fontWeight: 'bold',
+      color: '#333',
     }
 
 });
