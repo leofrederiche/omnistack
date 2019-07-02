@@ -3,7 +3,10 @@ import Routes from './routes';
 import { YellowBox } from 'react-native';
 
 YellowBox.ignoreWarnings(
-  ['Unrecognized WebSocket']
+	[
+		'Unrecognized WebSocket',
+		'Each child in a list should have a unique'
+	]
 );
 
 export default function App(){
