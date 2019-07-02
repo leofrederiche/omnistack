@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Image, TouchableOpacity, FlatList, Text  } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity, FlatList, Text, TextInput  } from 'react-native';
 import api from '../services/api';
 import io from 'socket.io-client';
 
@@ -18,12 +18,28 @@ export default class Feed extends Component{
 		),
 	});
 
+	state = {
+		feed : [],
+		newComment: { user: '', comment: ''},
+		current_id: ''
+	};
+
 	handleLike = (id) => {
 		api.post(`/posts/${id}/like`);
 	};
 
-	state = {
-		feed : []
+	handleSubmitComment = (id) => {
+		api.post(`/posts/${id}/comment`, this.state.newComment)
+		this.handleNewComment(id);
+	};
+
+	handleNewComment = (id) => {
+		if (this.state.current_id == id){
+			this.setState({ current_id: '' })
+		}
+		else {
+			this.setState({ current_id: id })
+		}
 	};
 
 	async componentDidMount()	{
@@ -65,7 +81,6 @@ export default class Feed extends Component{
 				})
 			})
 		});
-
 	};
 
 	render(){
@@ -93,7 +108,7 @@ export default class Feed extends Component{
 										<Image source={like} />
 									</TouchableOpacity>
 
-									<TouchableOpacity onPress={() => {}}>
+									<TouchableOpacity onPress={() => { this.handleNewComment(item._id) }}>
 										<Image source={comment} />
 									</TouchableOpacity>
 
@@ -117,32 +132,31 @@ export default class Feed extends Component{
 									})
 								}
 
-								<View style={styles.formComment}>
+								<View style={ [styles.formComment, (this.state.current_id != item._id) && (styles.hideComment) ]}>
 									<TextInput
 										style={styles.input}
 										autoCorrect={false}
 										autoCapitalize='none'
 										placeholder='Usuário'
 										value={this.state.newComment.user}
-										onChangeText={hashtags => this.setState({ newComment.user })}
+										onChangeText={user => this.setState({ user })}
 									/>
 
-								<TextInput
-									style={styles.input}
-									autoCorrect={false}
-									autoCapitalize='none'
-									placeHolder='Comentário'
-									vlue={this.state.newComment.comment}
-									onChangeText={comment => this.setState({ newComment.comment })}
-								/>
+									<TextInput
+										style={styles.input}
+										autoCorrect={false}
+										autoCapitalize='none'
+										placeholder='Comentário'
+										value={this.state.newComment.comment}
+										onChangeText={comment => this.setState({ comment })}
+									/>
 
-							<TouchableOpacity style={styles.commentButton} onPress={this.handleSubmitComment}>
-								<Text style={styles.commentButtonText}>Comentar</Text>
-							</TouchableOpacity>
-
+									<TouchableOpacity style={styles.commentButton} onPress={this.handleSubmitComment()}>
+										<Text style={styles.commentButtonText}>Comentar</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
 						</View>
-					</View>
-				</View>
 					)}
 				/>
 			</View>
@@ -215,5 +229,32 @@ const styles = StyleSheet.create({
 	commentUser: {
 		fontWeight: 'bold',
 		color: '#333',
+	},
+
+	input:{
+		borderRadius: 4,
+		borderWidth: 1,
+		borderColor: '#ccc',
+		marginTop: 10,
+		paddingHorizontal: 15
+	},
+
+	commentButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingVertical: 10,
+		marginTop: 10,
+
+		backgroundColor: '#7159c1',
+		borderRadius: 4
+	},
+
+	commentButtonText: {
+		color: '#eee'
+	},
+
+	hideComment: {
+		display: 'none'
 	}
+	
 });
